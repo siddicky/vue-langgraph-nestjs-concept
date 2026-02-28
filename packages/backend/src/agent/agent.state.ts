@@ -11,9 +11,9 @@ export const AgentStateAnnotation = Annotation.Root({
     reducer: (_prev: Task[], next: Task[]) => next,
     default: () => [],
   }),
-  pendingAction: Annotation<PendingAction | null>({
-    reducer: (_prev: PendingAction | null, next: PendingAction | null) => next,
-    default: () => null,
+  pendingActions: Annotation<PendingAction[]>({
+    reducer: (_prev: PendingAction[], next: PendingAction[]) => next,
+    default: () => [],
   }),
 });
 
