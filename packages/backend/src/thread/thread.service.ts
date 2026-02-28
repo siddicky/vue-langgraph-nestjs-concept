@@ -10,6 +10,6 @@ export class ThreadService {
   }
 
   generateThreadId(): string {
-    return `thread_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+    return `thread_${crypto.randomUUID()}`;
   }
 }

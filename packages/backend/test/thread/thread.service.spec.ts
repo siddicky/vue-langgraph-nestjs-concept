@@ -20,15 +20,11 @@ describe('ThreadService', () => {
       expect(ids.size).toBe(100);
     });
 
-    it('should include a timestamp component', () => {
-      const before = Date.now();
+    it('should return a UUID-based ID with "thread_" prefix', () => {
       const id = service.generateThreadId();
-      const after = Date.now();
-
-      const parts = id.split('_');
-      const timestamp = parseInt(parts[1], 10);
-      expect(timestamp).toBeGreaterThanOrEqual(before);
-      expect(timestamp).toBeLessThanOrEqual(after);
+      expect(id).toMatch(
+        /^thread_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+      );
     });
   });
 

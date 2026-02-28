@@ -6,8 +6,11 @@ import { TaskStatus, type Task } from '@todos/shared';
 export const useAgentStore = defineStore('agent', () => {
   const stream = useAgentStream();
 
-  // Initialize with default tasks
+  // Initialize with default tasks, then eagerly create thread and sync them to backend
   stream.tasks.value = [...defaultTasks];
+  stream.createThread().then(() => {
+    stream.pushTasks(stream.tasks.value);
+  }).catch(console.error);
 
   function addTask(title: string) {
     const maxId = stream.tasks.value.reduce((m, t) => Math.max(m, t.id), 0);

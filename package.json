@@ -4,7 +4,7 @@
   "private": true,
   "description": "Vue.js + LangGraph.js + NestJS — Todos AI Agent",
   "scripts": {
-    "dev": "concurrently -n backend,frontend -c blue,green \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
+    "dev": "concurrently -n shared,backend,frontend -c yellow,blue,green \"pnpm --filter shared dev\" \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
     "build": "pnpm --filter shared build && pnpm --filter backend build && pnpm --filter frontend build",
     "build:shared": "pnpm --filter shared build",
     "test": "pnpm --filter @todos/shared test && pnpm --filter backend test && pnpm --filter frontend test"

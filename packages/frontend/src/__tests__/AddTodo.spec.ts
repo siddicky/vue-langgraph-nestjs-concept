@@ -14,7 +14,7 @@ vi.mock('../composables/useAgentStream', () => {
       tasks: ref([]),
       isStreaming: ref(false),
       interruptPayload: ref(null),
-      createThread: vi.fn(),
+      createThread: vi.fn().mockResolvedValue(undefined),
       sendMessage: vi.fn(),
       resumeWithInput: vi.fn(),
       getState: vi.fn(),

@@ -60,6 +60,7 @@ describe('useAgentStream', () => {
   describe('createThread', () => {
     it('should fetch /agent/thread and set threadId', async () => {
       const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
         json: () => Promise.resolve({ threadId: 'thread_abc' }),
       });
       vi.stubGlobal('fetch', mockFetch);
@@ -79,6 +80,7 @@ describe('useAgentStream', () => {
         callCount++;
         if (url.endsWith('/agent/thread')) {
           return Promise.resolve({
+            ok: true,
             json: () => Promise.resolve({ threadId: 'thread_new' }),
           });
         }
@@ -107,6 +109,7 @@ describe('useAgentStream', () => {
       const mockFetch = vi.fn().mockImplementation((url: string) => {
         if (url.endsWith('/agent/thread')) {
           return Promise.resolve({
+            ok: true,
             json: () => Promise.resolve({ threadId: 'thread_1' }),
           });
         }
@@ -134,6 +137,7 @@ describe('useAgentStream', () => {
       const mockFetch = vi.fn().mockImplementation((url: string) => {
         if (url.endsWith('/agent/thread')) {
           return Promise.resolve({
+            ok: true,
             json: () => Promise.resolve({ threadId: 'thread_1' }),
           });
         }
@@ -167,6 +171,7 @@ describe('useAgentStream', () => {
       const mockFetch = vi.fn().mockImplementation((url: string) => {
         if (url.endsWith('/agent/thread')) {
           return Promise.resolve({
+            ok: true,
             json: () => Promise.resolve({ threadId: 'thread_1' }),
           });
         }
@@ -219,6 +224,7 @@ describe('useAgentStream', () => {
       const mockFetch = vi.fn().mockImplementation((url: string) => {
         if (url.endsWith('/agent/thread')) {
           return Promise.resolve({
+            ok: true,
             json: () => Promise.resolve({ threadId: 'thread_1' }),
           });
         }

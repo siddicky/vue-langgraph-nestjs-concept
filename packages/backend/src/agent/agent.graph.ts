@@ -3,7 +3,7 @@ import { ChatOpenAI } from '@langchain/openai';
 import { ChatAnthropic } from '@langchain/anthropic';
 import { AIMessage } from '@langchain/core/messages';
 import { AgentStateAnnotation, type AgentStateType } from './agent.state';
-import { allTools } from './agent.tools';
+import { allTools, addTaskSchema, deleteTaskSchema, setTaskStatusSchema } from './agent.tools';
 import { TaskStatus } from '@todos/shared';
 
 function createLLM() {
@@ -88,7 +88,7 @@ function approvalNode(state: AgentStateType) {
     pendingAction: action,
   });
 
-  if (userResponse === 'reject') {
+  if (userResponse !== 'approve') {
     return {
       messages: [new AIMessage('Action cancelled by user.')],
       pendingAction: null,
@@ -108,25 +108,37 @@ function executeNode(state: AgentStateType) {
 
   switch (action.tool) {
     case 'addTask': {
+      const parsed = addTaskSchema.safeParse(action.args);
+      if (!parsed.success) {
+        return { messages: [new AIMessage(`Invalid addTask args: ${parsed.error.message}`)], pendingAction: null };
+      }
       const maxId = tasks.reduce((m, t) => Math.max(m, t.id), 0);
       tasks.push({
         id: maxId + 1,
-        title: action.args.title,
+        title: parsed.data.title,
         status: TaskStatus.todo,
       });
-      confirmation = `Added: "${action.args.title}"`;
+      confirmation = `Added: "${parsed.data.title}"`;
       break;
     }
     case 'deleteTask': {
-      tasks = tasks.filter((t) => t.id !== action.args.id);
-      confirmation = `Deleted task ${action.args.id}`;
+      const parsed = deleteTaskSchema.safeParse(action.args);
+      if (!parsed.success) {
+        return { messages: [new AIMessage(`Invalid deleteTask args: ${parsed.error.message}`)], pendingAction: null };
+      }
+      tasks = tasks.filter((t) => t.id !== parsed.data.id);
+      confirmation = `Deleted task ${parsed.data.id}`;
       break;
     }
     case 'setTaskStatus': {
+      const parsed = setTaskStatusSchema.safeParse(action.args);
+      if (!parsed.success) {
+        return { messages: [new AIMessage(`Invalid setTaskStatus args: ${parsed.error.message}`)], pendingAction: null };
+      }
       tasks = tasks.map((t) =>
-        t.id === action.args.id ? { ...t, status: action.args.status } : t,
+        t.id === parsed.data.id ? { ...t, status: parsed.data.status } : t,
       );
-      confirmation = `Task ${action.args.id} status changed to ${action.args.status}`;
+      confirmation = `Task ${parsed.data.id} status changed to ${parsed.data.status}`;
       break;
     }
   }

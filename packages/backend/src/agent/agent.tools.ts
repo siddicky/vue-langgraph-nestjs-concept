@@ -3,15 +3,15 @@ import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { TaskStatus } from '@todos/shared';
 
-const addTaskSchema = z.object({
+export const addTaskSchema = z.object({
   title: z.string().describe('The title of the task'),
 });
 
-const deleteTaskSchema = z.object({
+export const deleteTaskSchema = z.object({
   id: z.number().describe('The id of the task'),
 });
 
-const setTaskStatusSchema = z.object({
+export const setTaskStatusSchema = z.object({
   id: z.number().describe('The id of the task'),
   status: z.nativeEnum(TaskStatus).describe('The new status'),
 });
