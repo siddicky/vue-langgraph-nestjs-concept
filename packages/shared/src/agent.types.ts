@@ -1,4 +1,4 @@
-import type { Task } from './tasks.types.js';
+import type { Task } from './tasks.types';
 
 export interface PendingAction {
   tool: 'addTask' | 'deleteTask' | 'setTaskStatus';

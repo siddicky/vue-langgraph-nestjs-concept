@@ -1,5 +1,5 @@
-export { TaskStatus } from './tasks.types.js';
-export type { Task } from './tasks.types.js';
+export { TaskStatus } from './tasks.types';
+export type { Task } from './tasks.types';
 
 export type {
   PendingAction,
@@ -7,4 +7,4 @@ export type {
   InterruptPayload,
   StreamEventType,
   StreamEvent,
-} from './agent.types.js';
+} from './agent.types';
