@@ -16,7 +16,7 @@ function createLLM() {
   }
 
   return new ChatOpenAI({
-    model: 'gpt-4o',
+    model: 'gpt-5-mini',
   }).bindTools(allTools);
 }
 
