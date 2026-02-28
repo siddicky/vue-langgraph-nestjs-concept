@@ -1,6 +1,6 @@
 import { StateGraph, START, END, interrupt, Command } from '@langchain/langgraph'
 import { ChatOpenAI } from '@langchain/openai'
-import { AIMessage, HumanMessage, ToolMessage } from '@langchain/core/messages'
+import { AIMessage, SystemMessage, ToolMessage } from '@langchain/core/messages'
 import { AgentStateAnnotation, AgentStateType } from './agent.state'
 import { agentTools, addTaskTool, deleteTaskTool, setTaskStatusTool } from './agent.tools'
 import { Task, TaskStatus } from '@todos/shared'
@@ -11,7 +11,7 @@ import { MemorySaver } from '@langchain/langgraph'
 
 async function chatNode(state: AgentStateType): Promise<Partial<AgentStateType>> {
   const model = new ChatOpenAI({
-    model: 'gpt-4o-mini',
+    model: 'gpt-4.1-mini',
     temperature: 0,
   }).bindTools(agentTools)
 
@@ -29,7 +29,7 @@ When users ask you to delete tasks or change their status, use the appropriate t
 `
 
   const messages = [
-    new HumanMessage({ content: systemPrompt, name: 'system_context' }),
+    new SystemMessage(systemPrompt),
     ...state.messages,
   ]
 
