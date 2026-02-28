@@ -61,6 +61,23 @@ describe('Shared types', () => {
       };
       expect(action.tool).toBe('setTaskStatus');
     });
+
+    it('should accept optional toolCallId', () => {
+      const action: PendingAction = {
+        tool: 'addTask',
+        args: { title: 'New task' },
+        toolCallId: 'call_123',
+      };
+      expect(action.toolCallId).toBe('call_123');
+    });
+
+    it('should work without toolCallId', () => {
+      const action: PendingAction = {
+        tool: 'deleteTask',
+        args: { id: 1 },
+      };
+      expect(action.toolCallId).toBeUndefined();
+    });
   });
 
   describe('AgentState interface', () => {
@@ -68,11 +85,11 @@ describe('Shared types', () => {
       const state: AgentState = {
         messages: [{ role: 'user', content: 'Hello' }],
         tasks: [{ id: 1, title: 'Task', status: TaskStatus.todo }],
-        pendingAction: null,
+        pendingActions: [],
       };
       expect(state.messages).toHaveLength(1);
       expect(state.tasks).toHaveLength(1);
-      expect(state.pendingAction).toBeNull();
+      expect(state.pendingActions).toEqual([]);
     });
   });
 
