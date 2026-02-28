@@ -52,7 +52,7 @@ export class AgentService {
 
       yield { type: 'done', data: null }
     } catch (err: any) {
-      if (err?.name === 'GraphInterrupt' || (err?.message && err.message.includes('interrupt'))) {
+      if (err?.name === 'GraphInterrupt') {
         // The graph raised an interrupt — get the interrupt payload from state
         const state = await this.graph.getState(config)
         const pendingInterrupts = (state as any).interrupts
