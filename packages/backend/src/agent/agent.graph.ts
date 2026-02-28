@@ -1,7 +1,7 @@
 import { StateGraph, interrupt, START, END } from '@langchain/langgraph';
 import { ChatOpenAI } from '@langchain/openai';
 import { ChatAnthropic } from '@langchain/anthropic';
-import { AIMessage } from '@langchain/core/messages';
+import { AIMessage, ToolMessage } from '@langchain/core/messages';
 import { AgentStateAnnotation, type AgentStateType } from './agent.state';
 import { allTools } from './agent.tools';
 import { TaskStatus } from '@todos/shared';
