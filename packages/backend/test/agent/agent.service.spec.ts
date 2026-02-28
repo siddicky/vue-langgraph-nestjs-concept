@@ -147,7 +147,7 @@ describe('AgentService', () => {
 
   describe('getState', () => {
     it('should return graph state values', async () => {
-      const mockValues = { messages: [], tasks: [], pendingAction: null };
+      const mockValues = { messages: [], tasks: [], pendingActions: [] };
       mockGraph.getState.mockResolvedValue({ values: mockValues });
 
       const result = await service.getState('thread_1');
@@ -158,7 +158,7 @@ describe('AgentService', () => {
   describe('updateState', () => {
     it('should update state and return new values', async () => {
       const tasks = [{ id: 1, title: 'Updated', status: TaskStatus.done }];
-      const mockValues = { messages: [], tasks, pendingAction: null };
+      const mockValues = { messages: [], tasks, pendingActions: [] };
       mockGraph.updateState.mockResolvedValue(undefined);
       mockGraph.getState.mockResolvedValue({ values: mockValues });
 

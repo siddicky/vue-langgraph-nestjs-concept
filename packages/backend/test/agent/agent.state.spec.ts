@@ -11,9 +11,9 @@ describe('AgentStateAnnotation', () => {
     expect(spec).toHaveProperty('tasks');
   });
 
-  it('should define the pendingAction channel', () => {
+  it('should define the pendingActions channel', () => {
     const spec = AgentStateAnnotation.spec;
-    expect(spec).toHaveProperty('pendingAction');
+    expect(spec).toHaveProperty('pendingActions');
   });
 
   it('should have all three channels and no extras', () => {
@@ -21,7 +21,7 @@ describe('AgentStateAnnotation', () => {
     const keys = Object.keys(spec);
     expect(keys).toContain('messages');
     expect(keys).toContain('tasks');
-    expect(keys).toContain('pendingAction');
+    expect(keys).toContain('pendingActions');
     expect(keys).toHaveLength(3);
   });
 

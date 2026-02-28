@@ -122,7 +122,7 @@ describe('AgentController', () => {
 
   describe('getState', () => {
     it('should return state from agentService', async () => {
-      const mockState = { messages: [], tasks: [], pendingAction: null };
+      const mockState = { messages: [], tasks: [], pendingActions: [] };
       agentService.getState.mockResolvedValue(mockState);
 
       const result = await controller.getState('thread_123');
@@ -134,7 +134,7 @@ describe('AgentController', () => {
   describe('updateState', () => {
     it('should call agentService.updateState with tasks', async () => {
       const tasks = [{ id: 1, title: 'Test', status: 'todo' as any }];
-      const updatedState = { messages: [], tasks, pendingAction: null };
+      const updatedState = { messages: [], tasks, pendingActions: [] };
       agentService.updateState.mockResolvedValue(updatedState);
 
       const result = await controller.updateState('thread_123', { tasks });
