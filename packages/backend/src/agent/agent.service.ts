@@ -43,14 +43,8 @@ export class AgentService {
         }
       }
 
-      // Check for interrupts
-      const state = await this.graph.getState(config)
-      if (state.next && state.next.length > 0 && state.tasks?.includes('approval' as any)) {
-        // interrupt happened — already handled via __interrupt__ in stream
-      }
-
       // Check if there's an interrupt in the state
-      const interrupts = (state as any).tasks
+      const state = await this.graph.getState(config)
       if (state.interrupts && (state.interrupts as any[]).length > 0) {
         const interruptValue = (state.interrupts as any[])[0].value
         yield { type: 'interrupt', data: interruptValue }
