@@ -6,7 +6,9 @@
     "build": "nest build",
     "dev": "nest start --watch",
     "start": "nest start",
-    "start:prod": "node dist/main"
+    "start:prod": "node dist/main",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@langchain/anthropic": "^0.3.19",
@@ -25,8 +27,12 @@
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.5",
+    "@nestjs/testing": "^11.1.14",
     "@types/express": "^5.0.0",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.13.9",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
     "typescript": "^5.7.3"
   }
 }
