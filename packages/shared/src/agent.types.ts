@@ -1,0 +1,30 @@
+import type { Task } from './tasks.types.js';
+
+export interface PendingAction {
+  tool: 'addTask' | 'deleteTask' | 'setTaskStatus';
+  args: Record<string, any>;
+}
+
+export interface AgentState {
+  messages: Array<{ role: string; content: string }>;
+  tasks: Task[];
+  pendingAction: PendingAction | null;
+}
+
+export interface InterruptPayload {
+  question: string;
+  options: string[];
+  pendingAction: PendingAction;
+}
+
+export type StreamEventType =
+  | 'message_chunk'
+  | 'state_update'
+  | 'interrupt'
+  | 'done'
+  | 'error';
+
+export interface StreamEvent {
+  type: StreamEventType;
+  data: any;
+}

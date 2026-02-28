@@ -1,0 +1,14 @@
+{
+  "name": "todos-ai",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Vue.js + LangGraph.js + NestJS — Todos AI Agent",
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c blue,green \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
+    "build": "pnpm --filter shared build && pnpm --filter backend build && pnpm --filter frontend build",
+    "build:shared": "pnpm --filter shared build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
