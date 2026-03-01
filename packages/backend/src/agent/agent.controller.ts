@@ -2,88 +2,83 @@ import {
   Controller,
   Post,
   Get,
-  Put,
   Body,
   Param,
   Res,
+  HttpCode,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AgentService } from './agent.service';
-import type { Task } from '@todos/shared';
 
-@Controller('agent')
+@Controller()
 export class AgentController {
   constructor(private agentService: AgentService) {}
 
-  @Post('thread')
+  @Post('threads')
   createThread() {
-    return { threadId: this.agentService.createThread() };
+    const thread_id = this.agentService.createThread();
+    const now = new Date().toISOString();
+    return {
+      thread_id,
+      created_at: now,
+      updated_at: now,
+      metadata: {},
+      status: 'idle',
+      values: {},
+    };
   }
 
-  @Post(':threadId/chat')
-  async chat(
-    @Param('threadId') threadId: string,
-    @Body('message') message: string,
-    @Res() res: Response,
-  ) {
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-
-    try {
-      for await (const event of this.agentService.streamChat(
-        threadId,
-        message,
-      )) {
-        res.write(`data: ${JSON.stringify(event)}\n\n`);
-      }
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Unknown error';
-      res.write(
-        `data: ${JSON.stringify({ type: 'error', data: { message } })}\n\n`,
-      );
-    }
-    res.end();
-  }
-
-  @Post(':threadId/resume')
-  async resume(
-    @Param('threadId') threadId: string,
-    @Body('response') userResponse: string,
-    @Res() res: Response,
-  ) {
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-
-    try {
-      for await (const event of this.agentService.resumeAfterInterrupt(
-        threadId,
-        userResponse,
-      )) {
-        res.write(`data: ${JSON.stringify(event)}\n\n`);
-      }
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Unknown error';
-      res.write(
-        `data: ${JSON.stringify({ type: 'error', data: { message } })}\n\n`,
-      );
-    }
-    res.end();
-  }
-
-  @Get(':threadId/state')
-  async getState(@Param('threadId') threadId: string) {
+  @Get('threads/:thread_id/state')
+  async getState(@Param('thread_id') threadId: string) {
     return this.agentService.getState(threadId);
   }
 
-  @Put(':threadId/state')
+  @Post('threads/:thread_id/state')
+  @HttpCode(200)
   async updateState(
-    @Param('threadId') threadId: string,
-    @Body() body: { tasks: Task[] },
+    @Param('thread_id') threadId: string,
+    @Body() body: { values: Record<string, any>; as_node?: string },
   ) {
-    return this.agentService.updateState(threadId, body);
+    return this.agentService.updateState(threadId, body.values, body.as_node);
+  }
+
+  @Post('threads/:thread_id/runs/stream')
+  async streamRun(
+    @Param('thread_id') threadId: string,
+    @Body()
+    body: {
+      input?: Record<string, any> | null;
+      command?: { resume: any };
+      assistant_id?: string;
+      stream_mode?: string[];
+    },
+    @Res() res: Response,
+  ) {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    let eventId = 0;
+
+    try {
+      for await (const event of this.agentService.streamRun(threadId, body)) {
+        res.write(`id: ${eventId}\nevent: ${event.event}\ndata: ${JSON.stringify(event.data)}\n\n`);
+        eventId++;
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown error';
+      res.write(`id: ${eventId}\nevent: error\ndata: ${JSON.stringify({ message })}\n\n`);
+    }
+    res.end();
+  }
+
+  @Post('threads/:thread_id/history')
+  @HttpCode(200)
+  async getHistory(
+    @Param('thread_id') threadId: string,
+    @Body() body: { limit?: number },
+  ) {
+    return this.agentService.getHistory(threadId, body.limit);
   }
 }
