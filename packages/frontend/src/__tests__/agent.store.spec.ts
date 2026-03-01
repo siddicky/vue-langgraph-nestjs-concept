@@ -1,26 +1,41 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { shallowRef, computed, ref } from 'vue';
 import { setActivePinia, createPinia } from 'pinia';
 import { useAgentStore } from '../stores/agent';
 import { TaskStatus } from '@todos/shared';
 
-// Mock the composable so the store doesn't make real fetch calls
-vi.mock('../composables/useAgentStream', () => {
-  const { ref } = require('vue');
-  return {
-    useAgentStream: () => ({
-      threadId: ref(null),
-      messages: ref([]),
-      tasks: ref([]),
-      isStreaming: ref(false),
-      interruptPayload: ref(null),
-      createThread: vi.fn(),
-      sendMessage: vi.fn(),
-      resumeWithInput: vi.fn(),
-      getState: vi.fn(),
-      pushTasks: vi.fn(),
-    }),
-  };
-});
+// Mock @langchain/vue's useStream
+vi.mock('@langchain/vue', () => ({
+  useStream: () => ({
+    values: shallowRef({ tasks: [], messages: [], pendingActions: [] }),
+    messages: computed(() => []),
+    interrupt: computed(() => undefined),
+    interrupts: computed(() => []),
+    isLoading: ref(false),
+    error: computed(() => undefined),
+    branch: ref(''),
+    submit: vi.fn(),
+    stop: vi.fn(),
+    switchThread: vi.fn(),
+    history: computed(() => []),
+    isThreadLoading: computed(() => false),
+    setBranch: vi.fn(),
+    getMessagesMetadata: vi.fn(),
+    toolCalls: ref([]),
+    getToolCalls: vi.fn(() => []),
+    experimental_branchTree: computed(() => ({})),
+  }),
+}));
+
+// Mock @langchain/langgraph-sdk Client
+vi.mock('@langchain/langgraph-sdk', () => ({
+  Client: class MockClient {
+    threads = {
+      updateState: vi.fn(),
+      create: vi.fn(),
+    };
+  },
+}));
 
 describe('useAgentStore', () => {
   beforeEach(() => {
@@ -48,12 +63,6 @@ describe('useAgentStore', () => {
       expect(newTask.id).toBe(maxId + 1);
       expect(newTask.title).toBe('New task');
       expect(newTask.status).toBe(TaskStatus.todo);
-    });
-
-    it('should sync to backend via pushTasks', () => {
-      const store = useAgentStore();
-      store.addTask('Synced task');
-      // pushTasks is called internally (mocked)
     });
   });
 
@@ -126,14 +135,29 @@ describe('useAgentStore', () => {
       expect(store.messages).toEqual([]);
     });
 
-    it('should expose isStreaming', () => {
+    it('should expose isLoading', () => {
       const store = useAgentStore();
-      expect(store.isStreaming).toBe(false);
+      expect(store.isLoading).toBe(false);
     });
 
-    it('should expose interruptPayload', () => {
+    it('should expose interrupt as undefined when not interrupted', () => {
       const store = useAgentStore();
-      expect(store.interruptPayload).toBeNull();
+      expect(store.interrupt).toBeUndefined();
+    });
+
+    it('should expose sendMessage function', () => {
+      const store = useAgentStore();
+      expect(typeof store.sendMessage).toBe('function');
+    });
+
+    it('should expose resumeWithInput function', () => {
+      const store = useAgentStore();
+      expect(typeof store.resumeWithInput).toBe('function');
+    });
+
+    it('should expose setBranch function', () => {
+      const store = useAgentStore();
+      expect(typeof store.setBranch).toBe('function');
     });
   });
 });

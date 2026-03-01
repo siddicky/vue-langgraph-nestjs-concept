@@ -5,15 +5,18 @@ import { Button } from '@/components/ui/button';
 import { useAgentStore } from '@/stores/agent';
 
 const store = useAgentStore();
-const isOpen = computed(() => store.interruptPayload !== null);
-const payload = computed(() => store.interruptPayload);
+
+// useStream interrupt format: { value, when, resumable, ns }
+// value is the interrupt payload from the graph (our InterruptPayload shape)
+const isOpen = computed(() => store.interrupt?.value != null);
+const payload = computed(() => store.interrupt?.value as { question: string; options: string[]; pendingAction: any } | undefined);
 
 async function handleApprove() {
-  await store.resumeWithInput('approve');
+  store.resumeWithInput('approve');
 }
 
 async function handleReject() {
-  await store.resumeWithInput('reject');
+  store.resumeWithInput('reject');
 }
 </script>
 
@@ -22,7 +25,7 @@ async function handleReject() {
     :open="isOpen"
     title="Action Confirmation"
     :description="payload?.question"
-    @update:open="(val) => { if (!val) handleReject(); }"
+    @update:open="(val: boolean) => { if (!val) handleReject(); }"
   >
     <div class="flex justify-end gap-2 pt-4">
       <Button variant="outline" @click="handleReject">
