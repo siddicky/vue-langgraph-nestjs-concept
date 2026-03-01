@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { cn } from '@/lib/utils';
 
 const props = defineProps<{
@@ -23,7 +22,7 @@ function toggle() {
   <button
     type="button"
     role="checkbox"
-    :aria-checked="checked"
+    :aria-checked="checked ?? false"
     :disabled="disabled"
     :id="id"
     :class="

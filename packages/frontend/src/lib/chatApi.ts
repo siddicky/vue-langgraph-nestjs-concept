@@ -45,7 +45,7 @@ export const sendMessage = (params: {
 
   return client.runs.stream(params.threadId, 'agent', {
     input,
-    streamMode: ['values', 'messages'],
+    streamMode: ['values', 'messages', 'updates'],
   }) as AsyncGenerator<LangGraphMessagesEvent<LangChainMessage>>;
 };
 
@@ -58,6 +58,6 @@ export const resumeThread = (params: {
   return client.runs.stream(params.threadId, 'agent', {
     input: null,
     command: { resume: params.response },
-    streamMode: ['values', 'messages'],
+    streamMode: ['values', 'messages', 'updates'],
   }) as AsyncGenerator<LangGraphMessagesEvent<LangChainMessage>>;
 };
