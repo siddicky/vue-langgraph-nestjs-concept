@@ -71,5 +71,8 @@ export async function resumeWithInput(response: string) {
     if (chunk.event === 'values' && chunk.data?.tasks) {
       tasks.value = chunk.data.tasks;
     }
+    if (chunk.event === 'updates' && chunk.data?.__interrupt__?.[0]) {
+      interruptState.value = chunk.data.__interrupt__[0];
+    }
   }
 }
