@@ -18,6 +18,9 @@ export interface InterruptPayload {
   pendingAction: PendingAction;
 }
 
+/**
+ * @deprecated No longer used by frontend. Backend streaming now uses Platform API SSE format.
+ */
 export type StreamEventType =
   | 'message_chunk'
   | 'state_update'
@@ -25,6 +28,9 @@ export type StreamEventType =
   | 'done'
   | 'error';
 
+/**
+ * @deprecated No longer used by frontend. Backend streaming now uses Platform API SSE format.
+ */
 export interface StreamEvent {
   type: StreamEventType;
   data: any;
