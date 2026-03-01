@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AI-powered todo app demonstrating **LangGraph.js interrupt handling**, **bidirectional shared state**, and **SSE streaming**. Monorepo with a Vue 3 frontend, NestJS 11 backend, and shared types package. Ported from the CopilotKit example-todos-app, replacing CopilotKit with direct LangGraph.js integration.
+AI-powered todo app demonstrating **LangGraph.js interrupt handling**, **bidirectional shared state**, **SSE streaming**, and **LangGraph Platform API compatibility**. Monorepo with a Vue 3 frontend (using `@langchain/vue` `useStream`), NestJS 11 backend, and shared types package. Ported from the CopilotKit example-todos-app, replacing CopilotKit with direct LangGraph.js integration.
 
 ## Commands
 
@@ -17,7 +17,7 @@ pnpm dev
 
 # Or individually:
 pnpm --filter backend dev      # NestJS on :3000 (watch mode)
-pnpm --filter frontend dev     # Vite on :5173 (proxies /agent → :3000)
+pnpm --filter frontend dev     # Vite on :5173 (proxies /threads, /runs → :3000)
 
 # Build (order matters: shared → backend → frontend)
 pnpm build
