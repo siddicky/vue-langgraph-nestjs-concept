@@ -1,7 +1,7 @@
 import { StateGraph, interrupt, START, END } from '@langchain/langgraph';
 import { ChatOpenAI } from '@langchain/openai';
 import { ChatAnthropic } from '@langchain/anthropic';
-import { AIMessage, ToolMessage } from '@langchain/core/messages';
+import { isAIMessage, ToolMessage } from '@langchain/core/messages';
 import { AgentStateAnnotation, type AgentStateType } from './agent.state';
 import { allTools } from './agent.tools';
 import { TaskStatus } from '@todos/shared';
@@ -42,7 +42,7 @@ async function chatNode(state: AgentStateType) {
 function shouldContinue(state: AgentStateType) {
   const lastMsg = state.messages[state.messages.length - 1];
   if (
-    lastMsg instanceof AIMessage &&
+    isAIMessage(lastMsg) &&
     lastMsg.tool_calls &&
     lastMsg.tool_calls.length > 0
   ) {
@@ -54,7 +54,7 @@ function shouldContinue(state: AgentStateType) {
 // Node: Parse ALL tool calls into pendingActions array
 function parseToolNode(state: AgentStateType) {
   const lastMsg = state.messages[state.messages.length - 1];
-  if (!(lastMsg instanceof AIMessage) || !lastMsg.tool_calls?.length) {
+  if (!isAIMessage(lastMsg) || !lastMsg.tool_calls?.length) {
     return {};
   }
   return {
