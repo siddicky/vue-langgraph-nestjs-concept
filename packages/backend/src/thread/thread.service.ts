@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { MemorySaver } from '@langchain/langgraph-checkpoint';
 
 @Injectable()
@@ -10,6 +11,6 @@ export class ThreadService {
   }
 
   generateThreadId(): string {
-    return `thread_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+    return randomUUID();
   }
 }

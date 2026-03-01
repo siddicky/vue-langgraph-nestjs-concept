@@ -8,9 +8,11 @@ describe('ThreadService', () => {
   });
 
   describe('generateThreadId', () => {
-    it('should return a string starting with "thread_"', () => {
+    it('should return a valid UUID v4 string', () => {
       const id = service.generateThreadId();
-      expect(id).toMatch(/^thread_/);
+      expect(id).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
+      );
     });
 
     it('should generate unique thread IDs', () => {
@@ -18,17 +20,6 @@ describe('ThreadService', () => {
         Array.from({ length: 100 }, () => service.generateThreadId()),
       );
       expect(ids.size).toBe(100);
-    });
-
-    it('should include a timestamp component', () => {
-      const before = Date.now();
-      const id = service.generateThreadId();
-      const after = Date.now();
-
-      const parts = id.split('_');
-      const timestamp = parseInt(parts[1], 10);
-      expect(timestamp).toBeGreaterThanOrEqual(before);
-      expect(timestamp).toBeLessThanOrEqual(after);
     });
   });
 
