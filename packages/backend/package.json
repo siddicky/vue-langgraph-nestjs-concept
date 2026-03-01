@@ -2,6 +2,11 @@
   "name": "backend",
   "version": "0.0.1",
   "private": true,
+  "author": {
+    "name": "Abdullah Siddique",
+    "email": "44811336+siddicky@users.noreply.github.com",
+    "url": "https://cv.siddicky.ca"
+  }
   "scripts": {
     "build": "nest build",
     "dev": "nest start --watch",
