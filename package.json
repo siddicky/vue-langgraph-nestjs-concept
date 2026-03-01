@@ -7,7 +7,7 @@
     "name": "Abdullah Siddique",
     "email": "44811336+siddicky@users.noreply.github.com",
     "url": "https://cv.siddicky.ca"
-  }
+  },
   "scripts": {
     "dev": "concurrently -n backend,frontend -c blue,green \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
     "build": "pnpm --filter shared build && pnpm --filter backend build && pnpm --filter frontend build",
