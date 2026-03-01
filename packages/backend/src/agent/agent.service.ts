@@ -6,7 +6,7 @@ import { buildAgentGraph } from './agent.graph';
 import { ThreadService } from '../thread/thread.service';
 import type { Task } from '@todos/shared';
 
-interface ThreadState {
+export interface ThreadState {
   values: Record<string, any>;
   next: string[];
   checkpoint: { thread_id: string; checkpoint_id: string; checkpoint_ns: string };
