@@ -13,7 +13,7 @@
   "dependencies": {
     "@langchain/core": "^1.1.29",
     "@langchain/langgraph-sdk": "https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/langgraph-sdk@6ab74c7bda685dee7e9ad42364ad6f344ffa0489",
-    "@langchain/vue": "https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/vue@6ab74c7bda685dee7e9ad42364ad6f344ffa0489",
+    "@langchain/vue": "https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/vue@2001",
     "@todos/shared": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

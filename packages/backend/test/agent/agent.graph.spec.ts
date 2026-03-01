@@ -359,8 +359,12 @@ describe('Graph node logic (unit tests via direct invocation)', () => {
 
       // Task should still exist (rejection cancels the action)
       const state = await graph.getState(config);
-      const lastMsg = state.values.messages[state.values.messages.length - 1];
-      expect(lastMsg.content).toContain('cancelled');
+      const msgs = state.values.messages;
+      // The ToolMessage with "cancelled" is followed by a respond node AI message
+      const cancelMsg = msgs.find(
+        (m: any) => m.content && typeof m.content === 'string' && m.content.includes('cancelled'),
+      );
+      expect(cancelMsg).toBeDefined();
     });
   });
 

@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@assistant-ui/vue': file:packages/frontend/vendor/assistant-ui-vue-0.1.0.tgz
+  '@assistant-ui/cloud': file:packages/frontend/vendor/assistant-ui-cloud-0.0.1.tgz
+  assistant-stream: file:packages/frontend/vendor/assistant-stream-0.2.23.tgz
+
 importers:
 
   .:
@@ -89,13 +94,13 @@ importers:
     dependencies:
       '@langchain/core':
         specifier: ^1.1.29
-        version: 1.1.29(openai@6.25.0(ws@8.19.0)(zod@3.25.76))
+        version: 1.1.29(openai@6.25.0(ws@8.19.0)(zod@4.3.6))
       '@langchain/langgraph-sdk':
         specifier: https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/langgraph-sdk@6ab74c7bda685dee7e9ad42364ad6f344ffa0489
-        version: https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/langgraph-sdk@6ab74c7bda685dee7e9ad42364ad6f344ffa0489(@langchain/core@1.1.29(openai@6.25.0(ws@8.19.0)(zod@3.25.76)))(vue@3.5.29(typescript@5.9.3))
+        version: https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/langgraph-sdk@6ab74c7bda685dee7e9ad42364ad6f344ffa0489(@langchain/core@1.1.29(openai@6.25.0(ws@8.19.0)(zod@4.3.6)))(vue@3.5.29(typescript@5.9.3))
       '@langchain/vue':
-        specifier: https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/vue@6ab74c7bda685dee7e9ad42364ad6f344ffa0489
-        version: https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/vue@6ab74c7bda685dee7e9ad42364ad6f344ffa0489(@langchain/core@1.1.29(openai@6.25.0(ws@8.19.0)(zod@3.25.76)))(vue@3.5.29(typescript@5.9.3))
+        specifier: https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/vue@2001
+        version: https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/vue@2001(@langchain/core@1.1.29(openai@6.25.0(ws@8.19.0)(zod@4.3.6)))(vue@3.5.29(typescript@5.9.3))
       '@todos/shared':
         specifier: workspace:*
         version: link:../shared
@@ -884,8 +889,8 @@ packages:
     peerDependencies:
       '@langchain/core': ^1.1.29
 
-  '@langchain/vue@https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/vue@6ab74c7bda685dee7e9ad42364ad6f344ffa0489':
-    resolution: {tarball: https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/vue@6ab74c7bda685dee7e9ad42364ad6f344ffa0489}
+  '@langchain/vue@https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/vue@2001':
+    resolution: {tarball: https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/vue@2001}
     version: 0.0.1
     peerDependencies:
       '@langchain/core': ^1.1.27
@@ -3765,6 +3770,9 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
@@ -4535,6 +4543,24 @@ snapshots:
       - '@opentelemetry/sdk-trace-base'
       - openai
 
+  '@langchain/core@1.1.29(openai@6.25.0(ws@8.19.0)(zod@4.3.6))':
+    dependencies:
+      '@cfworker/json-schema': 4.1.1
+      ansi-styles: 5.2.0
+      camelcase: 6.3.0
+      decamelize: 1.2.0
+      js-tiktoken: 1.0.21
+      langsmith: 0.5.7(openai@6.25.0(ws@8.19.0)(zod@4.3.6))
+      mustache: 4.2.0
+      p-queue: 6.6.2
+      uuid: 11.1.0
+      zod: 3.25.76
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+      - '@opentelemetry/exporter-trace-otlp-proto'
+      - '@opentelemetry/sdk-trace-base'
+      - openai
+
   '@langchain/langgraph-checkpoint@https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/langgraph-checkpoint@6ab74c7bda685dee7e9ad42364ad6f344ffa0489(@langchain/core@1.1.29(openai@6.25.0(ws@8.19.0)(zod@3.25.76)))':
     dependencies:
       '@langchain/core': 1.1.29(openai@6.25.0(ws@8.19.0)(zod@3.25.76))
@@ -4548,6 +4574,16 @@ snapshots:
       uuid: 13.0.0
     optionalDependencies:
       '@langchain/core': 1.1.29(openai@6.25.0(ws@8.19.0)(zod@3.25.76))
+      vue: 3.5.29(typescript@5.9.3)
+
+  '@langchain/langgraph-sdk@https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/langgraph-sdk@6ab74c7bda685dee7e9ad42364ad6f344ffa0489(@langchain/core@1.1.29(openai@6.25.0(ws@8.19.0)(zod@4.3.6)))(vue@3.5.29(typescript@5.9.3))':
+    dependencies:
+      '@types/json-schema': 7.0.15
+      p-queue: 9.1.0
+      p-retry: 7.1.1
+      uuid: 13.0.0
+    optionalDependencies:
+      '@langchain/core': 1.1.29(openai@6.25.0(ws@8.19.0)(zod@4.3.6))
       vue: 3.5.29(typescript@5.9.3)
 
   '@langchain/langgraph@https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/langgraph@6ab74c7bda685dee7e9ad42364ad6f344ffa0489(@langchain/core@1.1.29(openai@6.25.0(ws@8.19.0)(zod@3.25.76)))(vue@3.5.29(typescript@5.9.3))(zod-to-json-schema@3.25.1(zod@3.25.76))(zod@3.25.76)':
@@ -4575,10 +4611,10 @@ snapshots:
     transitivePeerDependencies:
       - ws
 
-  '@langchain/vue@https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/vue@6ab74c7bda685dee7e9ad42364ad6f344ffa0489(@langchain/core@1.1.29(openai@6.25.0(ws@8.19.0)(zod@3.25.76)))(vue@3.5.29(typescript@5.9.3))':
+  '@langchain/vue@https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/vue@2001(@langchain/core@1.1.29(openai@6.25.0(ws@8.19.0)(zod@4.3.6)))(vue@3.5.29(typescript@5.9.3))':
     dependencies:
-      '@langchain/core': 1.1.29(openai@6.25.0(ws@8.19.0)(zod@3.25.76))
-      '@langchain/langgraph-sdk': https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/langgraph-sdk@6ab74c7bda685dee7e9ad42364ad6f344ffa0489(@langchain/core@1.1.29(openai@6.25.0(ws@8.19.0)(zod@3.25.76)))(vue@3.5.29(typescript@5.9.3))
+      '@langchain/core': 1.1.29(openai@6.25.0(ws@8.19.0)(zod@4.3.6))
+      '@langchain/langgraph-sdk': https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/langgraph-sdk@6ab74c7bda685dee7e9ad42364ad6f344ffa0489(@langchain/core@1.1.29(openai@6.25.0(ws@8.19.0)(zod@4.3.6)))(vue@3.5.29(typescript@5.9.3))
       vue: 3.5.29(typescript@5.9.3)
     transitivePeerDependencies:
       - '@angular/core'
@@ -6531,6 +6567,17 @@ snapshots:
     optionalDependencies:
       openai: 6.25.0(ws@8.19.0)(zod@3.25.76)
 
+  langsmith@0.5.7(openai@6.25.0(ws@8.19.0)(zod@4.3.6)):
+    dependencies:
+      '@types/uuid': 10.0.0
+      chalk: 5.6.2
+      console-table-printer: 2.15.0
+      p-queue: 6.6.2
+      semver: 7.7.4
+      uuid: 10.0.0
+    optionalDependencies:
+      openai: 6.25.0(ws@8.19.0)(zod@4.3.6)
+
   leven@3.1.0: {}
 
   lilconfig@3.1.3: {}
@@ -6719,6 +6766,12 @@ snapshots:
     optionalDependencies:
       ws: 8.19.0
       zod: 3.25.76
+
+  openai@6.25.0(ws@8.19.0)(zod@4.3.6):
+    optionalDependencies:
+      ws: 8.19.0
+      zod: 4.3.6
+    optional: true
 
   ora@5.4.1:
     dependencies:
@@ -7627,3 +7680,6 @@ snapshots:
     optional: true
 
   zod@3.25.76: {}
+
+  zod@4.3.6:
+    optional: true

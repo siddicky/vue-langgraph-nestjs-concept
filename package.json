@@ -11,5 +11,12 @@
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "@assistant-ui/vue": "file:packages/frontend/vendor/assistant-ui-vue-0.1.0.tgz",
+      "@assistant-ui/cloud": "file:packages/frontend/vendor/assistant-ui-cloud-0.0.1.tgz",
+      "assistant-stream": "file:packages/frontend/vendor/assistant-stream-0.2.23.tgz"
+    }
   }
 }
