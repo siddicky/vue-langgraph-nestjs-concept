@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AI-powered todo app demonstrating **LangGraph.js interrupt handling**, **bidirectional shared state**, and **SSE streaming**. Monorepo with a Vue 3 frontend, NestJS 11 backend, and shared types package. Ported from the CopilotKit example-todos-app, replacing CopilotKit with direct LangGraph.js integration.
+AI-powered todo app demonstrating **LangGraph.js interrupt handling**, **bidirectional shared state**, and **SSE streaming**. Monorepo with a Vue 3 frontend (powered by [assistant-ui-vue](https://github.com/siddicky/assistant-ui-vue)), NestJS 11 backend, and shared types package. Uses `@assistant-ui/vue` + `@assistant-ui/vue-langgraph` for the chat UI, replacing the previous `@langchain/vue` implementation.
 
 ## Commands
 
@@ -17,7 +17,7 @@ pnpm dev
 
 # Or individually:
 pnpm --filter backend dev      # NestJS on :3000 (watch mode)
-pnpm --filter frontend dev     # Vite on :5173 (proxies /agent → :3000)
+pnpm --filter frontend dev     # Vite on :5173 (proxies /threads → :3000)
 
 # Build (order matters: shared → backend → frontend)
 pnpm build
@@ -47,13 +47,13 @@ cd packages/frontend && npx vitest run src/__tests__/agent.store.spec.ts
 
 ### `backend` — NestJS 11 + LangGraph.js
 - **Modules**: `AppModule` → `AgentModule` + `ThreadModule` (global) + `ConfigModule` (global)
-- **`AgentController`** — 5 endpoints under `/agent/`:
-  - `POST /agent/thread` — create new thread
-  - `POST /agent/:threadId/chat` — SSE stream (body: `{ message, tasks }`)
-  - `POST /agent/:threadId/resume` — resume after interrupt (body: `{ response }`)
-  - `GET /agent/:threadId/state` — get LangGraph state
-  - `PUT /agent/:threadId/state` — push frontend state into graph
-- **`AgentService`** — implements `OnModuleInit`, builds graph on init, wraps LangGraph execution as async generators yielding `StreamEvent`
+- **`AgentController`** — LangGraph Platform-style endpoints:
+  - `POST /threads` — create new thread
+  - `GET /threads/:thread_id/state` — get thread state
+  - `POST /threads/:thread_id/state` — update thread state
+  - `POST /threads/:thread_id/runs/stream` — SSE stream (body: `{ input, command, assistant_id, stream_mode }`)
+  - `POST /threads/:thread_id/history` — get conversation history
+- **`AgentService`** — implements `OnModuleInit`, builds graph on init, wraps LangGraph execution as async generators yielding SSE events
 - **`ThreadService`** — manages `MemorySaver` checkpointer (in-memory, ephemeral — state lost on restart)
 
 #### LangGraph StateGraph (`agent.graph.ts`)
@@ -67,11 +67,15 @@ START → chat → [has tool_call?] → parse_tool → approval → execute → 
 - **Interrupt**: `approval` node calls `interrupt()` for destructive actions (`deleteTask`, `setTaskStatus`); `addTask` passes through. Resumed via `Command({ resume })`. Interrupt detected in stream via `chunk.__interrupt__`
 - **Multi-LLM**: Switchable via `LLM_PROVIDER` env — OpenAI (`gpt-4o`) or Anthropic (`claude-sonnet-4-6`)
 
-### `frontend` — Vue 3 + Vite 6 + Pinia + Tailwind CSS 3
-- **`useAgentStream` composable** — all HTTP/SSE logic; manual `ReadableStream` reader parsing `text/event-stream` (double-newline split)
-- **Pinia store** (`stores/agent.ts`) — wraps composable, seeds default tasks, adds local CRUD that syncs to backend via `pushTasks()`
-- **UI components** (`components/ui/`) — shadcn-vue style, built on Radix Vue primitives (`Button`, `Input`, `Checkbox`, `Dialog`, `Label`), using `class-variance-authority` + `clsx` + `tailwind-merge`
-- **App components**: `AddTodo`, `TasksList`, `Task`, `AgentChat`, `InterruptDialog`
+### `frontend` — Vue 3 + Vite 6 + Pinia + Tailwind CSS 3 + assistant-ui-vue
+- **`@assistant-ui/vue`** — Provides `AssistantRuntimeProvider`, `ThreadRoot`, `ThreadMessages`, `ComposerRoot`, `ComposerInput`, `ComposerSend`, `MessageRoot`, `MessageParts`, and other chat UI primitives
+- **`@assistant-ui/vue-langgraph`** — Provides `useLangGraphRuntime` composable for LangGraph backend integration
+- **`useTodosLangGraphRuntime` composable** (`composables/useTodosLangGraphRuntime.ts`) — Sets up the LangGraph runtime, manages thread lifecycle, handles task state sync from stream events
+- **`chatApi.ts`** (`lib/chatApi.ts`) — API helper functions using `@langchain/langgraph-sdk` Client for thread creation, state management, and message streaming
+- **Pinia store** (`stores/agent.ts`) — Manages task CRUD with optimistic updates and backend sync via `pushTasks()`
+- **UI components** (`components/ui/`) — Native implementations for `Button`, `Input`, `Checkbox`, `Dialog`, `Label` using `class-variance-authority` + `clsx` + `tailwind-merge`
+- **App components**: `AddTodo`, `TasksList`, `Task`, `AgentChat` (wraps assistant-ui-vue Thread), `InterruptDialog`
+- **Vendored packages**: `@assistant-ui/vue`, `@assistant-ui/vue-langgraph`, `assistant-stream`, `@assistant-ui/cloud` are vendored as tarballs in `.vendor/` (not yet published to npm)
 - Uses `VITE_API_URL` (defaults to empty string — relative URLs through Vite proxy)
 - No Vue Router (single page app)
 
@@ -89,9 +93,10 @@ See `packages/backend/.env.example` for a template.
 
 ## Key Patterns
 
-- **SSE streaming**: Backend yields `StreamEvent` objects as `text/event-stream`; frontend reads with `ReadableStream` API (not EventSource), splitting on `\n\n`
-- **Bidirectional state sync**: Frontend pushes tasks to backend via `PUT /agent/:id/state`; backend pushes task updates to frontend via `state_update` SSE events
-- **Human-in-the-loop**: LangGraph `interrupt()` in the approval node pauses the graph; frontend shows `InterruptDialog`; user response sent via `POST /agent/:id/resume` and resumed with `Command({ resume })`
+- **assistant-ui-vue integration**: `App.vue` wraps the app with `AssistantRuntimeProvider` using a runtime from `useTodosLangGraphRuntime()`. `AgentChat.vue` uses `ThreadRoot`, `ThreadMessages`, `ComposerRoot`, etc. for the chat UI.
+- **SSE streaming**: Backend yields events as `text/event-stream`; frontend streams via `@langchain/langgraph-sdk` Client which `useTodosLangGraphRuntime` feeds into the assistant-ui-vue runtime
+- **Bidirectional state sync**: Frontend pushes tasks to backend via `POST /threads/:id/state`; backend pushes task updates to frontend via `values` SSE events which the runtime composable intercepts
+- **Human-in-the-loop**: LangGraph `interrupt()` in the approval node pauses the graph; frontend shows `InterruptDialog`; user response sent via resume stream which the runtime composable handles
 - **Test structure**: Backend tests in `packages/backend/test/` (Jest + ts-jest), frontend tests in `packages/frontend/src/__tests__/` (Vitest + happy-dom + @vue/test-utils), shared tests in `packages/shared/test/` (Vitest)
 - **No linting/formatting config**: No ESLint or Prettier is configured
 - **Backend tsconfig is standalone** (does not extend `tsconfig.base.json`) — uses CommonJS module + Node resolution for NestJS compatibility

@@ -11,17 +11,21 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@langchain/core": "^1.1.29",
-    "@langchain/langgraph-sdk": "https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/langgraph-sdk@6ab74c7bda685dee7e9ad42364ad6f344ffa0489",
-    "@langchain/vue": "https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/vue@6ab74c7bda685dee7e9ad42364ad6f344ffa0489",
+    "@assistant-ui/vue": "file:.vendor/assistant-ui-vue-0.1.0.tgz",
+    "@assistant-ui/vue-langgraph": "file:.vendor/assistant-ui-vue-langgraph-0.0.1.tgz",
+    "@assistant-ui/cloud": "file:.vendor/assistant-ui-cloud-0.0.1.tgz",
+    "assistant-stream": "file:.vendor/assistant-stream-0.2.23.tgz",
+    "@langchain/core": "^0.3.80",
+    "@langchain/langgraph-sdk": "^0.0.107",
     "@todos/shared": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-vue-next": "^0.474.0",
     "pinia": "^2.3.1",
-    "radix-vue": "^1.9.12",
     "tailwind-merge": "^3.0.2",
-    "vue": "^3.5.13"
+    "uuid": "^11.1.0",
+    "vue": "^3.5.13",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@types/node": "^22.19.13",
