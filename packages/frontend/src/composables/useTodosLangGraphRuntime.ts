@@ -18,27 +18,35 @@ async function ensureThread(): Promise<string> {
 }
 
 export function useTodosLangGraphRuntime() {
-  const runtime = useLangGraphRuntime({
-    stream: async (messages: LangChainMessage[]) => {
-      const id = await ensureThread();
+  let runtime: any;
 
-      const generator = sendMessage({
-        threadId: id,
-        messages,
-        tasks: tasks.value,
-      });
+  const stream = async (messages: LangChainMessage[]) => {
+    const id = await ensureThread();
 
-      for await (const chunk of generator) {
-        // Intercept values events to sync tasks
-        if (chunk.event === 'values' && chunk.data?.tasks) {
-          tasks.value = chunk.data.tasks;
-        }
-        // Track interrupt state from updates events
-        if (chunk.event === 'updates' && chunk.data?.__interrupt__?.[0]) {
-          interruptState.value = chunk.data.__interrupt__[0];
-        }
+    const generator = sendMessage({
+      threadId: id,
+      messages,
+      tasks: tasks.value,
+    });
+
+   for await (const chunk of generator) {
+      // Intercept values events to sync tasks
+      if (chunk.event === 'values' && chunk.data?.tasks) {
+        tasks.value = chunk.data.tasks;
       }
-    },
+      // Track interrupt state from updates events
+      if (chunk.event === 'updates' && chunk.data?.__interrupt__?.[0]) {
+        interruptState.value = chunk.data.__interrupt__[0];
+      }
+      // Forward all chunks to the LangGraph runtime so messages are accumulated
+      if (runtime && typeof runtime.appendLangChainChunk === 'function') {
+        runtime.appendLangChainChunk(chunk);
+      }
+    }
+  };
+
+  runtime = useLangGraphRuntime({
+    stream,
   });
 
   return runtime;
