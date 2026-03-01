@@ -100,10 +100,13 @@ importers:
         version: file:packages/frontend/.vendor/assistant-ui-vue-0.1.0.tgz(typescript@5.9.3)(vue@3.5.29(typescript@5.9.3))
       '@assistant-ui/vue-langgraph':
         specifier: file:.vendor/assistant-ui-vue-langgraph-0.0.1.tgz
-        version: file:packages/frontend/.vendor/assistant-ui-vue-langgraph-0.0.1.tgz(typescript@5.9.3)(vue@3.5.29(typescript@5.9.3))
+        version: file:packages/frontend/.vendor/assistant-ui-vue-langgraph-0.0.1.tgz(@langchain/core@0.3.80(openai@6.25.0(ws@8.19.0)(zod@3.25.76)))(typescript@5.9.3)(vue@3.5.29(typescript@5.9.3))
+      '@langchain/core':
+        specifier: ^0.3.80
+        version: 0.3.80(openai@6.25.0(ws@8.19.0)(zod@3.25.76))
       '@langchain/langgraph-sdk':
         specifier: ^0.0.107
-        version: 0.0.107
+        version: 0.0.107(@langchain/core@0.3.80(openai@6.25.0(ws@8.19.0)(zod@3.25.76)))
       '@todos/shared':
         specifier: workspace:*
         version: link:../shared
@@ -846,6 +849,10 @@ packages:
     engines: {node: '>=20'}
     peerDependencies:
       '@langchain/core': ^1.1.29
+
+  '@langchain/core@0.3.80':
+    resolution: {integrity: sha512-vcJDV2vk1AlCwSh3aBm/urQ1ZrlXFFBocv11bz/NBUfLWD5/UDNMzwPdaAd2dKvNmTWa9FM2lirLU3+JCf4cRA==}
+    engines: {node: '>=18'}
 
   '@langchain/core@1.1.29':
     resolution: {integrity: sha512-BPoegTtIdZX4gl2kxcSXAlLrrJFl1cxeRsk9DM/wlIuvyPrFwjWqrEK5NwF5diDt5XSArhQxIFaifGAl4F7fgw==}
@@ -2605,6 +2612,23 @@ packages:
   jsonfile@6.2.0:
     resolution: {integrity: sha512-FGuPw30AdOIUTRMC2OMRtQV+jkVj2cfPqSeWXv1NEAJ1qZ5zb1X6z1mFhbfOB/iy3ssJCD+3KuZ8r8C3uVFlAg==}
 
+  langsmith@0.3.87:
+    resolution: {integrity: sha512-XXR1+9INH8YX96FKWc5tie0QixWz6tOqAsAKfcJyPkE0xPep+NDz0IQLR32q4bn10QK3LqD2HN6T3n6z1YLW7Q==}
+    peerDependencies:
+      '@opentelemetry/api': '*'
+      '@opentelemetry/exporter-trace-otlp-proto': '*'
+      '@opentelemetry/sdk-trace-base': '*'
+      openai: '*'
+    peerDependenciesMeta:
+      '@opentelemetry/api':
+        optional: true
+      '@opentelemetry/exporter-trace-otlp-proto':
+        optional: true
+      '@opentelemetry/sdk-trace-base':
+        optional: true
+      openai:
+        optional: true
+
   langsmith@0.5.7:
     resolution: {integrity: sha512-FjYf2oBGMoSXnaT4SRaFguIiGJaonZ5VKWKJDPl9awLZjz2RkN29AcQWceecSINVzXzTvtRWPOjAWT+XggqNNg==}
     peerDependencies:
@@ -3876,9 +3900,10 @@ snapshots:
     dependencies:
       assistant-stream: file:packages/frontend/.vendor/assistant-stream-0.2.23.tgz
 
-  '@assistant-ui/vue-langgraph@file:packages/frontend/.vendor/assistant-ui-vue-langgraph-0.0.1.tgz(typescript@5.9.3)(vue@3.5.29(typescript@5.9.3))':
+  '@assistant-ui/vue-langgraph@file:packages/frontend/.vendor/assistant-ui-vue-langgraph-0.0.1.tgz(@langchain/core@0.3.80(openai@6.25.0(ws@8.19.0)(zod@3.25.76)))(typescript@5.9.3)(vue@3.5.29(typescript@5.9.3))':
     dependencies:
       '@assistant-ui/vue': file:packages/frontend/.vendor/assistant-ui-vue-0.1.0.tgz(typescript@5.9.3)(vue@3.5.29(typescript@5.9.3))
+      '@langchain/core': 0.3.80(openai@6.25.0(ws@8.19.0)(zod@3.25.76))
       assistant-stream: file:packages/frontend/.vendor/assistant-stream-0.2.23.tgz
       uuid: 11.1.0
       vue: 3.5.29(typescript@5.9.3)
@@ -4569,6 +4594,26 @@ snapshots:
       '@langchain/core': 1.1.29(openai@6.25.0(ws@8.19.0)(zod@3.25.76))
       zod: 3.25.76
 
+  '@langchain/core@0.3.80(openai@6.25.0(ws@8.19.0)(zod@3.25.76))':
+    dependencies:
+      '@cfworker/json-schema': 4.1.1
+      ansi-styles: 5.2.0
+      camelcase: 6.3.0
+      decamelize: 1.2.0
+      js-tiktoken: 1.0.21
+      langsmith: 0.3.87(openai@6.25.0(ws@8.19.0)(zod@3.25.76))
+      mustache: 4.2.0
+      p-queue: 6.6.2
+      p-retry: 4.6.2
+      uuid: 10.0.0
+      zod: 3.25.76
+      zod-to-json-schema: 3.25.1(zod@3.25.76)
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+      - '@opentelemetry/exporter-trace-otlp-proto'
+      - '@opentelemetry/sdk-trace-base'
+      - openai
+
   '@langchain/core@1.1.29(openai@6.25.0(ws@8.19.0)(zod@3.25.76))':
     dependencies:
       '@cfworker/json-schema': 4.1.1
@@ -4592,12 +4637,14 @@ snapshots:
       '@langchain/core': 1.1.29(openai@6.25.0(ws@8.19.0)(zod@3.25.76))
       uuid: 10.0.0
 
-  '@langchain/langgraph-sdk@0.0.107':
+  '@langchain/langgraph-sdk@0.0.107(@langchain/core@0.3.80(openai@6.25.0(ws@8.19.0)(zod@3.25.76)))':
     dependencies:
       '@types/json-schema': 7.0.15
       p-queue: 6.6.2
       p-retry: 4.6.2
       uuid: 9.0.1
+    optionalDependencies:
+      '@langchain/core': 0.3.80(openai@6.25.0(ws@8.19.0)(zod@3.25.76))
 
   '@langchain/langgraph-sdk@1.6.5(@langchain/core@1.1.29(openai@6.25.0(ws@8.19.0)(zod@3.25.76)))':
     dependencies:
@@ -6538,6 +6585,17 @@ snapshots:
     optionalDependencies:
       graceful-fs: 4.2.11
 
+  langsmith@0.3.87(openai@6.25.0(ws@8.19.0)(zod@3.25.76)):
+    dependencies:
+      '@types/uuid': 10.0.0
+      chalk: 4.1.2
+      console-table-printer: 2.15.0
+      p-queue: 6.6.2
+      semver: 7.7.4
+      uuid: 10.0.0
+    optionalDependencies:
+      openai: 6.25.0(ws@8.19.0)(zod@3.25.76)
+
   langsmith@0.5.7(openai@6.25.0(ws@8.19.0)(zod@3.25.76)):
     dependencies:
       '@types/uuid': 10.0.0
@@ -7636,7 +7694,6 @@ snapshots:
   zod-to-json-schema@3.25.1(zod@3.25.76):
     dependencies:
       zod: 3.25.76
-    optional: true
 
   zod@3.25.76: {}
 

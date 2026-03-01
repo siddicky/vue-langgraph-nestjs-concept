@@ -5,23 +5,12 @@ import {
   ThreadMessages,
   ThreadIf,
   ThreadEmpty,
-  ThreadScrollToBottom,
   ComposerRoot,
   ComposerInput,
   ComposerSend,
   ComposerCancel,
   MessageRoot,
   MessageParts,
-  BranchPickerRoot,
-  BranchPickerPrevious,
-  BranchPickerNext,
-  BranchPickerNumber,
-  BranchPickerCount,
-  ActionBarRoot,
-  ActionBarCopy,
-  ActionBarReload,
-  ActionBarEdit,
-  MessageIf,
 } from '@assistant-ui/vue';
 import InterruptDialog from './InterruptDialog.vue';
 

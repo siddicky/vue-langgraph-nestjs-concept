@@ -15,6 +15,7 @@
     "@assistant-ui/vue-langgraph": "file:.vendor/assistant-ui-vue-langgraph-0.0.1.tgz",
     "@assistant-ui/cloud": "file:.vendor/assistant-ui-cloud-0.0.1.tgz",
     "assistant-stream": "file:.vendor/assistant-stream-0.2.23.tgz",
+    "@langchain/core": "^0.3.80",
     "@langchain/langgraph-sdk": "^0.0.107",
     "@todos/shared": "workspace:*",
     "class-variance-authority": "^0.7.1",
