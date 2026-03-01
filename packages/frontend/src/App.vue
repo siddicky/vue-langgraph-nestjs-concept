@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import { AssistantRuntimeProvider } from '@assistant-ui/vue';
+import { useAgentStore } from '@/stores/agent';
 import TasksList from '@/components/TasksList.vue';
-import AgentChat from '@/components/AgentChat.vue';
+import ChatThread from '@/components/chat/ChatThread.vue';
+import InterruptDialog from '@/components/InterruptDialog.vue';
+
+const store = useAgentStore();
 </script>
 
 <template>
@@ -21,8 +26,11 @@ import AgentChat from '@/components/AgentChat.vue';
           <TasksList />
         </div>
 
-        <!-- Chat Panel -->
-        <AgentChat />
+        <!-- Chat Panel (wrapped in AssistantRuntimeProvider) -->
+        <AssistantRuntimeProvider :runtime="store.runtime">
+          <ChatThread />
+          <InterruptDialog />
+        </AssistantRuntimeProvider>
       </div>
     </main>
   </div>

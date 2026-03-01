@@ -1,30 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { shallowRef, computed, ref } from 'vue';
+import { computed } from 'vue';
 import { setActivePinia, createPinia } from 'pinia';
 import { useAgentStore } from '../stores/agent';
 import { TaskStatus } from '@todos/shared';
 
-// Mock @langchain/vue's useStream
-vi.mock('@langchain/vue', () => ({
-  useStream: () => ({
-    values: shallowRef({ tasks: [], messages: [], pendingActions: [] }),
-    messages: computed(() => []),
-    interrupt: computed(() => undefined),
-    interrupts: computed(() => []),
-    isLoading: ref(false),
-    error: computed(() => undefined),
-    branch: ref(''),
-    submit: vi.fn(),
-    stop: vi.fn(),
-    switchThread: vi.fn(),
-    history: computed(() => []),
-    isThreadLoading: computed(() => false),
-    setBranch: vi.fn(),
-    getMessagesMetadata: vi.fn(),
-    toolCalls: ref([]),
-    getToolCalls: vi.fn(() => []),
-    experimental_branchTree: computed(() => ({})),
-  }),
+// Mock @assistant-ui/vue
+vi.mock('@assistant-ui/vue', () => ({
+  useExternalStoreRuntime: vi.fn(() => ({
+    thread: {},
+    threads: { mainItem: {} },
+    subscribe: vi.fn(),
+  })),
+  useExternalMessageConverter: vi.fn(() => computed(() => [])),
+}));
+
+// Mock @assistant-ui/vue-langgraph
+vi.mock('@assistant-ui/vue-langgraph', () => ({
+  convertLangChainMessages: vi.fn(() => []),
 }));
 
 // Mock @langchain/langgraph-sdk Client
@@ -32,7 +24,15 @@ vi.mock('@langchain/langgraph-sdk', () => ({
   Client: class MockClient {
     threads = {
       updateState: vi.fn(),
-      create: vi.fn(),
+      create: vi.fn().mockResolvedValue({ thread_id: 'test-thread' }),
+      getState: vi.fn().mockResolvedValue({ values: {}, tasks: [] }),
+    };
+    runs = {
+      stream: vi.fn(() => ({
+        [Symbol.asyncIterator]: () => ({
+          next: () => Promise.resolve({ done: true }),
+        }),
+      })),
     };
   },
 }));
@@ -130,24 +130,9 @@ describe('useAgentStore', () => {
       expect(store.threadId).toBeNull();
     });
 
-    it('should expose messages', () => {
+    it('should expose interruptPayload as null when not interrupted', () => {
       const store = useAgentStore();
-      expect(store.messages).toEqual([]);
-    });
-
-    it('should expose isLoading', () => {
-      const store = useAgentStore();
-      expect(store.isLoading).toBe(false);
-    });
-
-    it('should expose interrupt as undefined when not interrupted', () => {
-      const store = useAgentStore();
-      expect(store.interrupt).toBeUndefined();
-    });
-
-    it('should expose sendMessage function', () => {
-      const store = useAgentStore();
-      expect(typeof store.sendMessage).toBe('function');
+      expect(store.interruptPayload).toBeNull();
     });
 
     it('should expose resumeWithInput function', () => {
@@ -155,9 +140,9 @@ describe('useAgentStore', () => {
       expect(typeof store.resumeWithInput).toBe('function');
     });
 
-    it('should expose setBranch function', () => {
+    it('should expose runtime', () => {
       const store = useAgentStore();
-      expect(typeof store.setBranch).toBe('function');
+      expect(store.runtime).toBeDefined();
     });
   });
 });

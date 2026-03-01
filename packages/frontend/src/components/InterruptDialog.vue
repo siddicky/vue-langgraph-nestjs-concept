@@ -6,10 +6,8 @@ import { useAgentStore } from '@/stores/agent';
 
 const store = useAgentStore();
 
-// useStream interrupt format: { value, when, resumable, ns }
-// value is the interrupt payload from the graph (our InterruptPayload shape)
-const isOpen = computed(() => store.interrupt?.value != null);
-const payload = computed(() => store.interrupt?.value as { question: string; options: string[]; pendingAction: any } | undefined);
+const isOpen = computed(() => store.interruptPayload != null);
+const payload = computed(() => store.interruptPayload);
 
 async function handleApprove() {
   store.resumeWithInput('approve');
