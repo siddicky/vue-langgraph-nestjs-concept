@@ -13,7 +13,7 @@ interface GraphState {
 
 export const useAgentStore = defineStore('agent', () => {
   const currentThreadId = ref<string | null>(null);
-  const apiUrl = import.meta.env.VITE_API_URL || '';
+  const apiUrl = import.meta.env.VITE_API_URL || window.location.origin;
 
   const client = new Client({ apiUrl });
 
