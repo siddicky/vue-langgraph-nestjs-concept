@@ -157,9 +157,25 @@ function executeNode(state: AgentStateType) {
   };
 }
 
+// Node: Respond — LLM summarises what was done after tool execution
+async function respondNode(state: AgentStateType) {
+  const llm = createLLM();
+
+  const response = await llm.invoke([
+    {
+      role: 'system',
+      content:
+        'You are a helpful todo assistant. Briefly confirm the actions you just performed. Do not call any tools.',
+    },
+    ...state.messages,
+  ]);
+
+  return { messages: [response] };
+}
+
 // Conditional edge: loop back to approval if more pending actions remain
 function shouldContinueAfterExecute(state: AgentStateType) {
-  return state.pendingActions.length > 0 ? 'approval' : END;
+  return state.pendingActions.length > 0 ? 'approval' : 'respond';
 }
 
 export function buildAgentGraph(checkpointer: any) {
@@ -168,6 +184,7 @@ export function buildAgentGraph(checkpointer: any) {
     .addNode('parse_tool', parseToolNode)
     .addNode('approval', approvalNode)
     .addNode('execute', executeNode)
+    .addNode('respond', respondNode)
     .addEdge(START, 'chat')
     .addConditionalEdges('chat', shouldContinue, {
       parse_tool: 'parse_tool',
@@ -177,8 +194,9 @@ export function buildAgentGraph(checkpointer: any) {
     .addEdge('approval', 'execute')
     .addConditionalEdges('execute', shouldContinueAfterExecute, {
       approval: 'approval',
-      [END]: END,
-    });
+      respond: 'respond',
+    })
+    .addEdge('respond', END);
 
   return graph.compile({ checkpointer });
 }
