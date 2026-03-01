@@ -17,6 +17,9 @@ function createLLM() {
 
   return new ChatOpenAI({
     model: 'gpt-5-mini',
+    reasoning: {
+      effort: "low"
+    },
   }).bindTools(allTools);
 }
 
@@ -26,6 +29,7 @@ async function chatNode(state: AgentStateType) {
 
   const systemContent = [
     'You are a helpful todo assistant. You can add, delete, and change the status of tasks.',
+    'Keep responses short. The user can already see the task list in the UI, so do not list or repeat tasks back to them.',
     'Current tasks:',
     JSON.stringify(state.tasks, null, 2),
   ].join('\n');
@@ -165,7 +169,7 @@ async function respondNode(state: AgentStateType) {
     {
       role: 'system',
       content:
-        'You are a helpful todo assistant. Briefly confirm the actions you just performed. Do not call any tools.',
+        'You are a helpful todo assistant. Briefly confirm the actions you just performed in one short sentence. Do not list or repeat task titles — the user can already see them in the UI. Do not call any tools.',
     },
     ...state.messages,
   ]);
