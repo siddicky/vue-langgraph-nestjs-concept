@@ -71,6 +71,7 @@ export function useAgentStream() {
         }
       }
     } finally {
+      reader.releaseLock();
       isStreaming.value = false;
     }
   }

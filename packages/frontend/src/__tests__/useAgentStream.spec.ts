@@ -19,6 +19,7 @@ function createMockSSEResponse(events: Array<{ type: string; data: any }>) {
         }
         return { done: true, value: undefined };
       },
+      releaseLock: vi.fn(),
     }),
   };
 
@@ -70,6 +71,31 @@ describe('useAgentStream', () => {
 
       expect(mockFetch).toHaveBeenCalledWith('/agent/thread', { method: 'POST' });
       expect(threadId.value).toBe('thread_abc');
+    });
+
+    it('should throw when response is not ok', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+      });
+      vi.stubGlobal('fetch', mockFetch);
+
+      const { createThread } = useAgentStream();
+      await expect(createThread()).rejects.toThrow(
+        'Failed to create thread: 500 Internal Server Error',
+      );
+    });
+
+    it('should throw when response is missing threadId', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({}),
+      });
+      vi.stubGlobal('fetch', mockFetch);
+
+      const { createThread } = useAgentStream();
+      await expect(createThread()).rejects.toThrow('Server response missing threadId');
     });
   });
 
@@ -243,6 +269,69 @@ describe('useAgentStream', () => {
       );
       expect(putCall).toBeDefined();
       expect(JSON.parse(putCall![1].body)).toEqual({ tasks });
+    });
+  });
+
+  describe('consumeStream error handling', () => {
+    function threadMock() {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ threadId: 'thread_1' }),
+      });
+    }
+
+    it('should throw when stream response is not ok', async () => {
+      const mockFetch = vi.fn().mockImplementation((url: string) => {
+        if (url.endsWith('/agent/thread')) return threadMock();
+        return Promise.resolve({ ok: false, status: 503, statusText: 'Service Unavailable' });
+      });
+      vi.stubGlobal('fetch', mockFetch);
+
+      const stream = useAgentStream();
+      await expect(stream.sendMessage('hello')).rejects.toThrow(
+        'Stream request failed: 503 Service Unavailable',
+      );
+    });
+
+    it('should not leave isStreaming true when stream response is not ok', async () => {
+      const mockFetch = vi.fn().mockImplementation((url: string) => {
+        if (url.endsWith('/agent/thread')) return threadMock();
+        return Promise.resolve({ ok: false, status: 503, statusText: 'Service Unavailable' });
+      });
+      vi.stubGlobal('fetch', mockFetch);
+
+      const stream = useAgentStream();
+      try { await stream.sendMessage('hello'); } catch { /* expected */ }
+      expect(stream.isStreaming.value).toBe(false);
+    });
+
+    it('should throw when response body is null', async () => {
+      const mockFetch = vi.fn().mockImplementation((url: string) => {
+        if (url.endsWith('/agent/thread')) return threadMock();
+        return Promise.resolve({ ok: true, body: null });
+      });
+      vi.stubGlobal('fetch', mockFetch);
+
+      const stream = useAgentStream();
+      await expect(stream.sendMessage('hello')).rejects.toThrow('Response body is null');
+    });
+
+    it('should reset isStreaming to false when read throws mid-stream', async () => {
+      const mockFetch = vi.fn().mockImplementation((url: string) => {
+        if (url.endsWith('/agent/thread')) return threadMock();
+        const body = {
+          getReader: () => ({
+            read: async () => { throw new Error('Network error'); },
+            releaseLock: vi.fn(),
+          }),
+        };
+        return Promise.resolve({ ok: true, body });
+      });
+      vi.stubGlobal('fetch', mockFetch);
+
+      const stream = useAgentStream();
+      try { await stream.sendMessage('hello'); } catch { /* expected */ }
+      expect(stream.isStreaming.value).toBe(false);
     });
   });
 });

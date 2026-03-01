@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { MemorySaver } from '@langchain/langgraph-checkpoint';
 
@@ -10,6 +11,6 @@ export class ThreadService {
   }
 
   generateThreadId(): string {
-    return `thread_${crypto.randomUUID()}`;
+    return `thread_${randomUUID()}`;
   }
 }
