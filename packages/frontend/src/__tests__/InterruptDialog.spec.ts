@@ -1,31 +1,28 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { shallowRef, computed, ref } from 'vue';
+import { ref, computed } from 'vue';
 import { setActivePinia, createPinia } from 'pinia';
 import InterruptDialog from '../components/InterruptDialog.vue';
 import { useAgentStore } from '../stores/agent';
 
-// Mock @langchain/vue's useStream
-vi.mock('@langchain/vue', () => ({
-  useStream: () => ({
-    values: shallowRef({ tasks: [], messages: [], pendingActions: [] }),
-    messages: computed(() => []),
+// Create shared tasks ref for mock
+const mockTasks = ref([
+  { id: 1, title: 'Buy groceries', status: 'todo' },
+  { id: 2, title: 'Clean the house', status: 'todo' },
+  { id: 3, title: 'Walk the dog', status: 'done' },
+]);
+
+// Mock the composable
+vi.mock('@/composables/useTodosLangGraphRuntime', () => ({
+  useTodosState: () => ({
+    threadId: computed(() => null),
+    tasks: mockTasks,
     interrupt: computed(() => undefined),
-    interrupts: computed(() => []),
-    isLoading: ref(false),
-    error: computed(() => undefined),
-    branch: ref(''),
-    submit: vi.fn(),
-    stop: vi.fn(),
-    switchThread: vi.fn(),
-    history: computed(() => []),
-    isThreadLoading: computed(() => false),
-    setBranch: vi.fn(),
-    getMessagesMetadata: vi.fn(),
-    toolCalls: ref([]),
-    getToolCalls: vi.fn(() => []),
-    experimental_branchTree: computed(() => ({})),
   }),
+  pushTasks: vi.fn((newTasks: any[]) => {
+    mockTasks.value = newTasks;
+  }),
+  resumeWithInput: vi.fn(),
 }));
 
 vi.mock('@langchain/langgraph-sdk', () => ({
@@ -40,6 +37,11 @@ vi.mock('@langchain/langgraph-sdk', () => ({
 describe('InterruptDialog', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    mockTasks.value = [
+      { id: 1, title: 'Buy groceries', status: 'todo' },
+      { id: 2, title: 'Clean the house', status: 'todo' },
+      { id: 3, title: 'Walk the dog', status: 'done' },
+    ];
   });
 
   it('should not render dialog when interrupt is undefined', () => {
