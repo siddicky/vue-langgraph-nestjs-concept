@@ -1,18 +1,23 @@
 import { Client } from '@langchain/langgraph-sdk';
 import type { LangChainMessage, LangGraphMessagesEvent } from '@assistant-ui/vue-langgraph';
 
-const createClient = () => {
-  const apiUrl = import.meta.env.VITE_API_URL || window.location.origin;
-  return new Client({ apiUrl });
+let clientInstance: Client | null = null;
+
+const getClient = () => {
+  if (!clientInstance) {
+    const apiUrl = import.meta.env.VITE_API_URL || window.location.origin;
+    clientInstance = new Client({ apiUrl });
+  }
+  return clientInstance;
 };
 
 export const createThread = async () => {
-  const client = createClient();
+  const client = getClient();
   return client.threads.create();
 };
 
 export const getThreadState = async (threadId: string) => {
-  const client = createClient();
+  const client = getClient();
   return client.threads.getState(threadId);
 };
 
@@ -20,7 +25,7 @@ export const updateThreadState = async (
   threadId: string,
   values: Record<string, unknown>,
 ) => {
-  const client = createClient();
+  const client = getClient();
   return client.threads.updateState(threadId, { values });
 };
 
@@ -29,7 +34,7 @@ export const sendMessage = (params: {
   messages: LangChainMessage[];
   tasks?: unknown[];
 }): AsyncGenerator<LangGraphMessagesEvent<LangChainMessage>> => {
-  const client = createClient();
+  const client = getClient();
 
   const input: Record<string, unknown> = {
     messages: params.messages,
@@ -48,7 +53,7 @@ export const resumeThread = (params: {
   threadId: string;
   response: string;
 }): AsyncGenerator<LangGraphMessagesEvent<LangChainMessage>> => {
-  const client = createClient();
+  const client = getClient();
 
   return client.runs.stream(params.threadId, 'agent', {
     input: null,

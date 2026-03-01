@@ -1,13 +1,13 @@
 import { ref, computed } from 'vue';
 import { useLangGraphRuntime } from '@assistant-ui/vue-langgraph';
-import type { LangChainMessage } from '@assistant-ui/vue-langgraph';
-import { createThread, getThreadState, sendMessage, resumeThread, updateThreadState } from '@/lib/chatApi';
+import type { LangChainMessage, LangGraphInterruptState } from '@assistant-ui/vue-langgraph';
+import { createThread, sendMessage, resumeThread, updateThreadState } from '@/lib/chatApi';
 import { defaultTasks } from '@/data/default-tasks';
 import type { Task } from '@todos/shared';
 
 const threadId = ref<string | null>(null);
 const tasks = ref<Task[]>([...defaultTasks]);
-const interruptValue = ref<any>(undefined);
+const interruptState = ref<LangGraphInterruptState | undefined>(undefined);
 
 async function ensureThread(): Promise<string> {
   if (!threadId.value) {
@@ -35,7 +35,7 @@ export function useTodosLangGraphRuntime() {
         }
         // Track interrupt state from updates events
         if (chunk.event === 'updates' && chunk.data?.__interrupt__?.[0]) {
-          interruptValue.value = chunk.data.__interrupt__[0];
+          interruptState.value = chunk.data.__interrupt__[0];
         }
       }
     },
@@ -48,7 +48,7 @@ export function useTodosState() {
   return {
     threadId: computed(() => threadId.value),
     tasks,
-    interrupt: computed(() => interruptValue.value),
+    interrupt: computed(() => interruptState.value),
   };
 }
 
@@ -60,7 +60,7 @@ export async function pushTasks(updatedTasks: Task[]) {
 
 export async function resumeWithInput(response: string) {
   if (!threadId.value) return;
-  interruptValue.value = undefined;
+  interruptState.value = undefined;
 
   const generator = resumeThread({
     threadId: threadId.value,
