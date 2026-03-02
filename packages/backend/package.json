@@ -20,6 +20,7 @@
     "@langchain/core": "^1.1.29",
     "@langchain/langgraph": "https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/langgraph@6ab74c7bda685dee7e9ad42364ad6f344ffa0489",
     "@langchain/langgraph-checkpoint": "https://pkg.pr.new/langchain-ai/langgraphjs/@langchain/langgraph-checkpoint@6ab74c7bda685dee7e9ad42364ad6f344ffa0489",
+    "@langchain/langgraph-sdk": "^1.6.1",
     "@langchain/openai": "^1.2.11",
     "@nestjs/common": "^11.0.11",
     "@nestjs/config": "^4.0.2",
