@@ -1,5 +1,8 @@
-import { AgentService } from '../../src/agent/agent.service';
+jest.mock('@langchain/langgraph-sdk', () => ({ Client: jest.fn() }));
+
+import { LocalAgentService } from '../../src/agent/agent.service';
 import { ThreadService } from '../../src/thread/thread.service';
+import { ConfigService } from '@nestjs/config';
 import { TaskStatus } from '@todos/shared';
 
 // Mock the graph builder
@@ -7,13 +10,14 @@ jest.mock('../../src/agent/agent.graph', () => ({
   buildAgentGraph: jest.fn(),
 }));
 
-describe('AgentService', () => {
-  let service: AgentService;
+describe('LocalAgentService', () => {
+  let service: LocalAgentService;
   let threadService: ThreadService;
   let mockGraph: any;
 
   beforeEach(() => {
-    threadService = new ThreadService();
+    const configService = { get: jest.fn().mockReturnValue('local') } as any;
+    threadService = new ThreadService(configService);
 
     mockGraph = {
       stream: jest.fn(),
@@ -25,7 +29,7 @@ describe('AgentService', () => {
     const { buildAgentGraph } = require('../../src/agent/agent.graph');
     buildAgentGraph.mockReturnValue(mockGraph);
 
-    service = new AgentService(threadService);
+    service = new LocalAgentService(threadService);
     service.onModuleInit();
   });
 

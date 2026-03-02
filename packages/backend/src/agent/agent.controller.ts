@@ -5,18 +5,22 @@ import {
   Body,
   Param,
   Res,
+  Inject,
   HttpCode,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { AgentService } from './agent.service';
+import type { IAgentService } from './agent.service.interface';
+import { AGENT_SERVICE } from './agent.constants';
 
 @Controller()
 export class AgentController {
-  constructor(private agentService: AgentService) {}
+  constructor(
+    @Inject(AGENT_SERVICE) private agentService: IAgentService,
+  ) {}
 
   @Post('threads')
-  createThread() {
-    const thread_id = this.agentService.createThread();
+  async createThread() {
+    const thread_id = await this.agentService.createThread();
     const now = new Date().toISOString();
     return {
       thread_id,

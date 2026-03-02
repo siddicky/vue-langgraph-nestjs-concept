@@ -46,16 +46,21 @@ cd packages/frontend && npx vitest run src/__tests__/agent.store.spec.ts
 - Compiled with `tsc` to `dist/` (ESM)
 - Frontend resolves directly from source via tsconfig path alias; backend requires built `dist/`
 
-### `backend` — NestJS 11 + LangGraph.js
-- **Modules**: `AppModule` → `AgentModule` + `ThreadModule` (global) + `ConfigModule` (global)
+### `backend` — NestJS 11 + LangGraph.js + `@langchain/langgraph-sdk`
+- **Modules**: `AppModule` → `LanggraphSdkModule` (global) + `AgentModule` + `ThreadModule` (global) + `ConfigModule` (global) + `AssistantsModule` + `CronsModule` + `StoreModule`
+- **Dual execution mode** (`LANGGRAPH_MODE` env): `"local"` (default) runs the graph in-process; `"remote"` delegates to a LangGraph Platform deployment via `@langchain/langgraph-sdk` `Client`
 - **`AgentController`** — LangGraph Platform API-compatible endpoints:
   - `POST /threads` — create new thread
   - `GET /threads/:thread_id/state` — get LangGraph state
   - `POST /threads/:thread_id/state` — update state (body: `{ values, as_node? }`)
   - `POST /threads/:thread_id/runs/stream` — SSE stream (body: `{ input?, command?, assistant_id?, stream_mode? }`)
   - `POST /threads/:thread_id/history` — state history (body: `{ limit? }`)
-- **`AgentService`** — implements `OnModuleInit`, builds graph on init, wraps LangGraph execution as async generators yielding Platform API SSE events (`metadata`, `values`, `messages`)
-- **`ThreadService`** — manages `MemorySaver` checkpointer (in-memory, ephemeral — state lost on restart)
+- **`IAgentService`** interface — shared contract for agent operations; injected via `AGENT_SERVICE` token
+  - **`LocalAgentService`** — implements `OnModuleInit`, builds graph on init, wraps local LangGraph execution (used when `LANGGRAPH_MODE=local`)
+  - **`RemoteAgentService`** — delegates to `client.threads.*` and `client.runs.stream()` from `@langchain/langgraph-sdk` (used when `LANGGRAPH_MODE=remote`)
+- **`LanggraphSdkModule`** (global) — provides a configured `Client` instance via `LANGGRAPH_CLIENT` injection token
+- **`ThreadService`** — manages `MemorySaver` checkpointer (local mode) + remote thread CRUD via `client.threads.*` (remote mode)
+- **`AssistantsService`** / **`CronsService`** / **`StoreService`** — wrap `client.assistants`, `client.crons`, `client.store` for Platform management features
 
 #### LangGraph StateGraph (`agent.graph.ts`)
 ```
@@ -84,6 +89,9 @@ START → chat → shouldContinue → parse_tool → approval → execute → sh
 | `OPENAI_API_KEY` | backend | — | Required when `LLM_PROVIDER=openai` |
 | `ANTHROPIC_API_KEY` | backend | — | Required when `LLM_PROVIDER=anthropic` |
 | `LLM_PROVIDER` | backend | `openai` | `"openai"` or `"anthropic"` |
+| `LANGGRAPH_MODE` | backend | `local` | `"local"` (in-process graph) or `"remote"` (SDK client to Platform) |
+| `LANGGRAPH_API_URL` | backend | `http://localhost:8123` | Remote LangGraph Platform URL (only when `LANGGRAPH_MODE=remote`) |
+| `LANGGRAPH_API_KEY` | backend | — | Remote LangGraph Platform API key (only when `LANGGRAPH_MODE=remote`) |
 | `PORT` | backend | `3000` | Backend listen port |
 | `LANGSMITH_TRACING` | backend | — | Enable LangSmith tracing (`true`) |
 | `LANGSMITH_API_KEY` | backend | — | LangSmith API key |

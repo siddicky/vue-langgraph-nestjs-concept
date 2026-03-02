@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AgentController } from '../../src/agent/agent.controller';
-import { AgentService } from '../../src/agent/agent.service';
+import { AGENT_SERVICE } from '../../src/agent/agent.constants';
+import type { IAgentService } from '../../src/agent/agent.service.interface';
 
 describe('AgentController', () => {
   let controller: AgentController;
-  let agentService: jest.Mocked<AgentService>;
+  let agentService: jest.Mocked<IAgentService>;
 
   beforeEach(async () => {
     const mockAgentService = {
@@ -18,18 +19,18 @@ describe('AgentController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AgentController],
       providers: [
-        { provide: AgentService, useValue: mockAgentService },
+        { provide: AGENT_SERVICE, useValue: mockAgentService },
       ],
     }).compile();
 
     controller = module.get<AgentController>(AgentController);
-    agentService = module.get(AgentService);
+    agentService = module.get(AGENT_SERVICE);
   });
 
   describe('POST /threads', () => {
-    it('should return platform-compatible thread object', () => {
-      agentService.createThread.mockReturnValue('550e8400-e29b-41d4-a716-446655440000');
-      const result = controller.createThread();
+    it('should return platform-compatible thread object', async () => {
+      agentService.createThread.mockReturnValue('550e8400-e29b-41d4-a716-446655440000' as any);
+      const result = await controller.createThread();
       expect(result.thread_id).toBe('550e8400-e29b-41d4-a716-446655440000');
       expect(result.status).toBe('idle');
       expect(result.metadata).toEqual({});

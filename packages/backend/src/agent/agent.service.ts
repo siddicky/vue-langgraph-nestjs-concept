@@ -4,7 +4,7 @@ import { Command } from '@langchain/langgraph';
 import { HumanMessage } from '@langchain/core/messages';
 import { buildAgentGraph } from './agent.graph';
 import { ThreadService } from '../thread/thread.service';
-import type { Task } from '@todos/shared';
+import type { IAgentService, StreamRunBody } from './agent.service.interface';
 
 export interface ThreadState {
   values: Record<string, any>;
@@ -17,7 +17,7 @@ export interface ThreadState {
 }
 
 @Injectable()
-export class AgentService implements OnModuleInit {
+export class LocalAgentService implements IAgentService, OnModuleInit {
   private graph!: ReturnType<typeof buildAgentGraph>;
 
   constructor(private threadService: ThreadService) {}
@@ -50,12 +50,7 @@ export class AgentService implements OnModuleInit {
 
   async *streamRun(
     threadId: string,
-    body: {
-      input?: Record<string, any> | null;
-      command?: { resume: any };
-      assistant_id?: string;
-      stream_mode?: string[];
-    },
+    body: StreamRunBody,
   ): AsyncGenerator<{ event: string; data: any }> {
     const config = { configurable: { thread_id: threadId } };
     const runId = randomUUID();
